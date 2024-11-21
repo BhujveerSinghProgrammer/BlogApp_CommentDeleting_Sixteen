@@ -1,0 +1,16 @@
+//Steps to perform Deleting Comment
+Step 1:- post-service.js:-
+
+//get posts by pagenumber and pazesize and userId
+
+export const loadAllPostsByuserId=(PageNumberInput,PageSizeInput,userId)=>{
+  return myAxious.get(`/api/ReactJsApis/getPostsByUserId?PageNumberInput=${PageNumberInput}&PageSizeInput=${PageSizeInput}&userId=${userId}`).then(response=>response.data); 
+}
+
+//
+
+
+Step 2:-
+Userdashboard.jsx:-
+
+

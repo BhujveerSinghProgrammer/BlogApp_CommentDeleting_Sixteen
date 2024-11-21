@@ -76,7 +76,7 @@ function NewFeed() {
                 <b>Yay! You have seen it all</b>
               </p>
             }
-          >
+           >
             {postContent?.Contents?.map((post) => (
               <Posts post={post} key={post.Id} />
             ))}

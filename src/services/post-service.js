@@ -64,4 +64,10 @@ export const loadAllPostsByPageNumberandPageSizeAndCategoryId=(PageNumberInput,P
   return myAxious.get(`/api/ReactJsApis/getpostsByPageNumberAndPageSizeAndCategorywise?PageNumberInput=${PageNumberInput}&PageSizeInput=${PageSizeInput}&Id=${Id}`).then(response=>response.data); 
 }
 
+//get posts by pagenumber and pazesize and userId
+
+export const loadAllPostsByuserId=(PageNumberInput,PageSizeInput,userId)=>{
+  return myAxious.get(`/api/ReactJsApis/getPostsByUserId?PageNumberInput=${PageNumberInput}&PageSizeInput=${PageSizeInput}&userId=${userId}`).then(response=>response.data); 
+}
+
 //

@@ -1,12 +1,101 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Base from '../../components/Base';
 import AddPost from '../../components/AddPost';
-import { Container } from 'reactstrap';
+import { Row, Col, Container } from 'reactstrap';
+import {CurrentUser} from '../../auth/index';
+import { loadAllPostsByuserId } from '../../services/post-service';
+import { toast } from 'react-toastify';
+import Posts from '../../components/Posts';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 const  Userdashboard=()=> {
+
+const[user,setUser]=useState({})
+
+   const [postContent, setPostContent] = useState({
+    Contents: [],
+    LastPage: 0,
+    PageNumber: 1,  // Start at page 1 (1-based)
+    PageSize: 10,   // Default page size
+    TotalElements: 0,
+    TotalPages: 0
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch paged posts when the page is first loaded or page changes
+  useEffect(() => {
+    setUser(CurrentUser());
+    changePage(currentPage);
+  }, [currentPage]);
+
+  // Handle page change
+  const changePage = (pageNumber) => {
+    // Skip if the page number exceeds TotalPages (unless TotalPages is 0 or undefined)
+    //Note:- postContent.TotalPages is greater than 0 and "pageNumber" is greater than "postContent.TotalPages" then return the function,
+    //Note:-if we want this "pageNumber > postContent.TotalPages" condition true and then return,then
+    //we will use it with "postContent.TotalPages>0" condition becoz on initial load "TotalPages" will be zero.
+
+    if (postContent.TotalPages > 0 && pageNumber > postContent.TotalPages) {
+      return;
+    }
+
+    loadAllPostsByuserId(pageNumber, postContent.PageSize,CurrentUser().Id)
+      .then((data) => {
+        console.log('data to ram ji', data);
+        // Only append posts that are not already in Contents to avoid duplicates
+        setPostContent((prevState) => ({
+          Contents: pageNumber === 1 ? data.Contents : [...prevState.Contents, ...data.Contents],
+          //if page ===1 then use "data.Contents" directly else use "[...prevState.Contents, ...data.Contents]" to append with existing data.  
+          LastPage: data.LastPage,
+          PageNumber: data.PageNumber,
+          PageSize: data.PageSize,
+          TotalElements: data.TotalElements,
+          TotalPages: data.TotalPages
+        }));
+      })
+      .catch((error) => {
+        toast.error('Error in loading posts pagewise');
+      });
+  };
+
+  const changePageInfinite = () => {
+    // Increment the current page to load the next page of content
+
+    if (currentPage < postContent.TotalPages || postContent.TotalPages === 0) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
   return (
     <Base>
     <Container>
-   <AddPost/>
+         <AddPost/>
+
+           <div className="container-fluid">
+      <Row>
+        <Col md={{ size: 12}}>
+          <h3>Blogs Count ({postContent?.TotalElements})</h3>
+
+          <InfiniteScroll
+            dataLength={postContent?.Contents?.length}
+            next={changePageInfinite}
+            hasMore={postContent.PageNumber < postContent.TotalPages || postContent.TotalPages === 0}
+            loader={<h4>Loading...</h4>}
+            endMessage={
+              <p style={{ textAlign: 'center' }}>
+                <b>Yay! You have seen it all</b>
+              </p>
+            }
+           >
+            {postContent?.Contents?.map((post) => (
+              <Posts post={post} key={post.Id} />
+            ))}
+          </InfiniteScroll>
+        </Col>
+      </Row>
+    </div>
+
+
     </Container>
 
     </Base>
