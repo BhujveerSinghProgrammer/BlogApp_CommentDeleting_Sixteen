@@ -52,7 +52,7 @@ const[user,setUser]=useState({})
           PageSize: data.PageSize,
           TotalElements: data.TotalElements,
           TotalPages: data.TotalPages
-        }).reverse);
+        }));
       })
       .catch((error) => {
         toast.error('Error in loading posts pagewise');
