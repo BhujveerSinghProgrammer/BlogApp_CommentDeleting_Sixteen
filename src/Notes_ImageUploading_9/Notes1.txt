@@ -1,0 +1,453 @@
+UPLOADING IMAGE IN REACT JS STEPS:-
+______________________________________________________________________________________________________________
+Sample:-
+=>open react strap -->search Form-->check for file
+=>Components-->AddPost.jsx:-
+import {Input} from "reactstrap";
+ <div className="mt-3">
+  <Label for="image">Select Post Banner</Label>
+      <Input id="image" type="file"/>
+ </div>
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Steps:-
+
+==>First we will create a Input with type="file" in our design from react strap
+==>then we will create a service to Post the image from react to sql server dsatabase
+==>then after insert we will call this service
+
+Full code:-
+
+
+post-service.js:-
+
+
+//upload post banner images
+
+export const uploadPostImage = (image, postId) => {
+  let formData = new FormData();
+  formData.append("image", image); // Ensure the parameter name matches what your API expects
+  console.log('formData',formData);
+  return privateAxious.post(`/api/ReactJsApis/UploadImage?Id=${postId}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }).then((response) => response.data);
+};
+
+
+
+
+AddPost.jsx:-
+
+import { Card, CardBody, Input, Form, Label, Container, Button } from "reactstrap";
+import { loadAllCategories } from "../services/category-service";
+import { useEffect, useState, useRef } from "react";
+import JoditEditor from "jodit-react";
+import { CurrentUser } from '../auth';
+import { createPost as doCreatePost, uploadPostImage } from "../services/post-service";
+import { toast } from "react-toastify";
+
+const AddPost = () => {
+  const editor = useRef(null);
+
+  const [post, setPost] = useState({
+    title: "",
+    content: "",
+    categoryid: ""
+  });
+
+  const [categories, setCategories] = useState([]);
+  const [user, setUser] = useState(undefined);
+  const [image, setImage] = useState(null);
+
+  // Load categories and user information
+  useEffect(() => {
+    setUser(CurrentUser());
+    loadAllCategories()
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const fieldChanged = (event) => {
+    setPost({
+      ...post,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  // Reset form data
+  const resetData = () => {
+    setPost({
+      title: "",
+      content: "",
+      categoryid: ""
+    });
+  };
+
+  // Handle content editor changes
+  const contentFieldChanged = (newContent) => {
+    setPost({ ...post, content: newContent });
+  };
+
+  // Handle file change for the image
+  const handleFileChange = (event) => {
+    console.log(event.target.files[0]);
+    setImage(event.target.files[0]);
+  };
+
+  // Create post function
+  const createPost = (event) => {
+    event.preventDefault();
+
+    // Form validation
+    if (post.title.trim() === '') {
+      alert('Title is required!');
+      return;
+    }
+    if (post.content.trim() === '') {
+      alert('Content is required!');
+      return;
+    }
+    if (post.categoryid === '') {
+      alert('Select a category!');
+      return;
+    }
+    if (!image) {
+      alert('Please select an image!');
+      return;
+    }
+
+    // Add user ID to post object
+    post['userId'] = user.Id;
+
+    // Submit the post form
+    doCreatePost(post)
+      .then(data => {
+        console.log('Post created successfully', data);
+        
+        // Upload the image after post creation
+        uploadPostImage(image, data.postId)
+          .then(() => {
+            toast.success("Image uploaded successfully!");
+          })
+          .catch((error) => {
+            toast.error("Image upload failed!");
+          });
+
+        toast.success(data.mgs); // Show success message for post creation
+
+        // Reset the form
+        setPost({
+          title: "",
+          content: "",
+          categoryid: ""
+        });
+      })
+      .catch((error) => {
+        toast.error("Post creation failed!");
+      });
+  };
+
+  return (
+    <div className="wrapper my-3">
+      <Card className="shadow mt-3">
+        <CardBody>
+          <h3>What's going on in your mind?</h3>
+          <Form onSubmit={createPost}>
+            <div className="my-3">
+              <Label for="title">Post Title</Label>
+              <Input
+                type="text"
+                id="title"
+                placeholder="Enter Here"
+                className="rounded-0"
+                name="title"
+                onChange={fieldChanged}
+                value={post.title}
+              />
+            </div>
+
+            <div className="my-3">
+              <Label for="content">Post Content</Label>
+              <JoditEditor
+                ref={editor}
+                value={post.content}
+                tabIndex={1}
+                onChange={contentFieldChanged}
+              />
+            </div>
+
+            {/* File upload field */}
+            <div className="mt-3">
+              <Label for="image">Select Post Banner</Label>
+              <Input
+                id="image"
+                type="file"
+                onChange={handleFileChange}
+              />
+            </div>
+
+            <div className="my-3">
+              <Label for="category">Post Category</Label>
+              <Input
+                type="select"
+                id="category"
+                className="rounded-0"
+                name="categoryid"
+                onChange={fieldChanged}
+                value={post.categoryid}
+              >
+                <option value="">Select a category</option> {/* Placeholder option */}
+                {categories.map((category) => (
+                  <option value={category.Id} key={category.Id}>
+                    {category.CategoryName}
+                  </option>
+                ))}
+              </Input>
+            </div>
+
+            <Container className="text-center">
+              <Button type="submit" className="rounded-0" color="primary">
+                Create Post
+              </Button>
+              <Button type="button" onClick={resetData} className="rounded-0 ms-2" color="danger">
+                Reset
+              </Button>
+            </Container>
+          </Form>
+        </CardBody>
+      </Card>
+    </div>
+  );
+};
+
+export default AddPost;
+
+
+
+
+Showing IMAGE IN REACT JS STEPS:-
+______________________________________________________________________________________________________________
+->our api will return the url for an image from uniqe image name,like given below:-
+{/* http://localhost:53719/api/ReactJsApis/GetImage?imageName=1_07dc3403-9c1f-4686-b7da-55e368d77345.png */}
+
+
+PostPage.jsx:-
+
+
+import React, { useEffect, useState } from 'react'; 
+import Base from '../components/Base';
+import { Link, useParams } from 'react-router-dom';
+import { loadPostsById } from '../services/post-service';
+import { toast } from 'react-toastify';
+import { Card, CardBody, CardText, Col, Container, Input, Row, Button } from 'reactstrap';
+import { createCommentPost, loadCommentsByContentId } from '../services/post-service';
+import { isLoggedIn } from '../auth';
+import { BASE_URL } from '../services/helper';
+const PostPage = () => {
+  const { Id } = useParams();
+  const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]); // Store the list of comments,fo binding comments
+  const [commentpost, setCommentpost] = useState({
+    Comment: "",
+    CategoryId: "",
+    ContentId: "",
+    UserId: ""
+  }); // this is for insertion of comments
+
+  // Loading Post...
+  useEffect(() => {
+    loadPostsById(Id)
+      .then((data) => {
+        console.log('Post Data:', data);
+        setPost(data);
+        setCommentpost({
+          ...commentpost,
+          CategoryId: data.CategoryId,
+          ContentId: data.Id,
+          UserId: data.userId
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error in Loading Post');
+      });
+  }, [Id]);
+
+  // Loading Comments...
+  useEffect(() => {
+    loadCommentsByContentId(Id)
+      .then((data) => {
+        console.log('Comments Data:', data);
+        // Ensure comments data is an array
+        if (Array.isArray(data)) {
+          setComments(data);
+        } else {
+          setComments([]);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error in Loading Comments');
+      });
+  }, [Id]);
+
+  // Handle field change:- event will automatically come to function as parameter.
+  const fieldChanged = (event) => {
+    setCommentpost({
+      ...commentpost,
+      Comment: event.target.value
+    });
+  };
+
+  // Handle submitting the comment
+  const createPost = (event) => {
+    if(!isLoggedIn())
+    {
+          setCommentpost({
+            ...commentpost,
+            Comment: "", // Clear the input field
+          });
+      toast.error('Login first to add comments!!');
+      return;
+    }
+    event.preventDefault();
+    if (commentpost.Comment.trim() === '') {
+      toast.error('Comment is required!');
+      return;
+    }
+
+    // Submit the form to the server
+    createCommentPost(commentpost)
+      .then((response) => {
+        console.log('API response after submitting comment:', response);
+
+        if (response.Error === "Ok") {
+          // Manually create a new comment object
+          const newComment = {
+            Comment: commentpost.Comment,
+            UserId: commentpost.UserId,
+            CategoryId: commentpost.CategoryId,
+            ContentId: commentpost.ContentId,
+            email: "example@domain.com",  // Replace with actual email if available
+            name: "User Name", // Replace with actual name if available
+            Doe: new Date().toISOString(), // Current date as the comment date
+            udt: new Date().toISOString() // Current date as update timestamp
+          };
+
+          setComments([newComment, ...comments]); // Add new comment to list
+          setCommentpost({
+            ...commentpost,
+            Comment: "", // Clear the input field
+          });
+          toast.success('Comment posted successfully!');
+        } else {
+          toast.error('Failed to post comment: ' + response.mgs);
+        }
+      })
+      .catch((error) => {
+        toast.error('Error submitting comment');
+        console.log(error);
+      });
+  };
+
+  if (!post) {
+    return <div>Loading post...</div>;
+  }
+
+  return (
+    <Base>
+      <Container className="mt-2 mb-2">
+        <Link to="/">Home</Link> / {post && <Link to="#">{post.CategoryName}</Link>}
+        <Row>
+          <Col md={12}>
+            <Card className="mt-3 ps-2 border-0">
+              <CardBody>
+                <CardText>
+                  Posted By <b style={{ color: 'Green' }}>{post.name}</b> on{' '}
+                  <b style={{ color: 'Orange' }}>{new Date(post.Doe)?.toLocaleDateString()}</b>
+                </CardText>
+                <CardText className="mt-2 mb-1">
+                  <span className="text-muted">Category - {post.CategoryName}</span>
+                </CardText>
+                <div className="divider" style={{ width: '100%', height: '1px', background: 'green', marginBottom: '3px' }} />
+                <CardText>
+                  <h4><b>{post.Title}</b></h4>
+                </CardText>
+                <div className="image-container mt-2 mb-3" style={{ maxWidth: '40%', height: '10%' }}>
+                  {/* <img src={post.ImageName?'https://nulm.gov.in/images/SlideImage/' + post.ImageName: 'https://nulm.gov.in/images/SlideImage/' + "10.jpg"} alt={post.Title} style={{ width: '100%' }} /> */}
+
+                  <img 
+                  src={post.ImageName ? `${BASE_URL}/api/ReactJsApis/GetImage?imageName=${post.ImageName}` : 'https://nulm.gov.in/images/SlideImage/10.jpg'} 
+                  alt={post.Title} 
+                 style={{ maxWidth: '40%', height: '10%' }}
+                  />
+
+{/* http://localhost:53719/api/ReactJsApis/GetImage?imageName=1_07dc3403-9c1f-4686-b7da-55e368d77345.png */}
+
+                </div>
+                <CardText dangerouslySetInnerHTML={{ __html: post.Content }} className="mt-2" />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Comments Section */}
+        <Row className="mt-0" style={{ backgroundColor: 'whitesmoke' }}>
+          <Col md={{ size: 9, offset: 0 }}>
+            <h4 style={{ color: 'green' }}>
+              Comments ({comments.length > 0 ? comments.length : 0})
+            </h4>
+            {comments.length > 0 ? (
+              comments.map((c, index) => (
+                <Card className="mt-0 border-0" key={index}>
+                  <CardBody>
+                    {c.Comment}
+                    <br />
+                    <h6 style={{ color: 'blue',fontSize:'11px' }}>{c.email}</h6>
+                  </CardBody>
+                </Card>
+              ))
+            ) : (
+              <p>No comments yet!</p>
+            )}
+            <Card className="mt-0 border-0">
+              <CardBody>
+                <Input
+                  type="textarea"
+                  id="Comment"
+                  name="Comment"
+                  value={commentpost.Comment}
+                   onChange={fieldChanged}  //Both will work
+                  //onChange={(event)=>setCommentpost({...commentpost,Comment: event.target.value})}
+                  //onChange={(event)=>setCommentpost(event.target.value)} // if we have only single key in our json object like given below:-const [commentpost, setCommentpost] = useState({Comment: "" });
+                  
+
+                  placeholder="Enter Comments Here"
+                />
+                <Button
+                  className="mt-2"
+                  onClick={createPost}
+                  style={{ marginTop: '5px' }}
+                  color="primary"
+                >
+                  Submit
+                </Button>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </Base>
+  );
+};
+
+export default PostPage;
+
+
+
+
+
+
