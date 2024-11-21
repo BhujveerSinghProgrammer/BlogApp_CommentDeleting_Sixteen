@@ -52,7 +52,7 @@ const[user,setUser]=useState({})
           PageSize: data.PageSize,
           TotalElements: data.TotalElements,
           TotalPages: data.TotalPages
-        }));
+        }).reverse);
       })
       .catch((error) => {
         toast.error('Error in loading posts pagewise');
@@ -70,7 +70,6 @@ const[user,setUser]=useState({})
     <Base>
     <Container>
          <AddPost/>
-
            <div className="container-fluid">
       <Row>
         <Col md={{ size: 12}}>
@@ -79,7 +78,7 @@ const[user,setUser]=useState({})
           <InfiniteScroll
             dataLength={postContent?.Contents?.length}
             next={changePageInfinite}
-            hasMore={postContent.PageNumber < postContent.TotalPages || postContent.TotalPages === 0}
+            hasMore={postContent?.PageNumber < postContent?.TotalPages || postContent?.TotalPages === 0}
             loader={<h4>Loading...</h4>}
             endMessage={
               <p style={{ textAlign: 'center' }}>
