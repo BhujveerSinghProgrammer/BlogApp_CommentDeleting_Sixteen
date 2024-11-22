@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import { NavLink as ReactLink, useNavigate } from 'react-router-dom';  //avoid page reload, when we click on 
 //Home,Login,Or Signup
 import {doLogout} from '../auth/index';
+import userContext from "../context/userContext";
+
+
 import {
   Collapse,
   Navbar,
@@ -19,6 +22,10 @@ import {
 import { isLoggedIn } from '../auth';
 import {CurrentUser} from '../auth';
 function CustomeNavBar() {
+
+  const useContextData=useContext(userContext);
+
+
   let navigate=useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
@@ -38,6 +45,12 @@ const logout=()=>
   doLogout(()=>{
     //logged out next function calling.
     setLogin(false); //we are setting login to false,by using useEffect it(setUser(CurrentUser())) will be called directly.becoz setlogin function changes the value of [login] thatswhy.
+ 
+useContextData.setUser({
+  data:null,
+  login:false
+});
+
    navigate("/");
 
   })

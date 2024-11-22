@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardText } from 'reactstrap'
 import { isLoggedIn,CurrentUser } from '../auth';
 
+import userContext from "../context/userContext";
+
 function Posts( { post = { Title: "This is Default Post Title", Content: "This is Default Content" } ,DoDeletePost}) {
 
+    const useContextData=useContext(userContext);
+    
   const[login,setLogin]=useState(false);
   const[user,setUser]=useState(undefined);
 
@@ -35,9 +39,16 @@ useEffect(()=>
           <Link style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}} className='btn btn-secondary border -0' to={'/Post/'+post.Id} >Read More..</Link>
 
 {/* we will show delete button when user is loggedIn else will not show */}
-{login && user.Id==post.userId?
+{/* {login && user.Id==post.userId?
+<Button onClick={()=>DoDeletePost(post)} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
+} */}
+
+
+{useContextData.user.login && user.Id==post.userId?
 <Button onClick={()=>DoDeletePost(post)} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
 }
+
+
         </div>
 
 

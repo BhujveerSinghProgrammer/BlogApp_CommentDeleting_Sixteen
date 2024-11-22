@@ -1,0 +1,39 @@
+//Note
+1.when we logout the application,still showing delete options above the post?
+2.to overcome this situation we will use global state/context api
+
+3. when we login we will set the login details to the global state using context api in Pages-->Login.jsx.
+
+4.after logout we will again set the global state using context api in CustomeNavBar.jsx file 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Full code(Overview):-
+
+1.Context-->UserProvide.jsx:-
+
+2.Pages-->Login.jsx
+
+const useContextData=useContext(userContext);
+
+useContextData.setUser({
+  data:user,
+  login:true
+});
+
+3.components-->CustomeNavBar.jsx
+import userContext from "../context/userContext";
+
+
+  const useContextData=useContext(userContext);
+
+useContextData.setUser({
+  data:{},
+  login:false
+});
+
+
+4.components-->Posts.jsx:-
+
+
+
+//Full Code(Completed)

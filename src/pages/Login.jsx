@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState,useContext } from "react";
 import Base from "../components/Base";
 import { Card, CardBody, CardHeader, Container, Form,FormGroup,Label,Input,Button, Row,Col } from "reactstrap";
 import { toast } from "react-toastify";
 import { loginUser } from "../services/user-service";
 import { doLogin } from "../auth";
 import { useNavigate } from "react-router-dom";
+import userContext from "../context/userContext";
 
 const Login=()=>{
+
+  const useContextData=useContext(userContext);
 
   const navigate=useNavigate();
 
@@ -61,6 +64,14 @@ loginUser(loginDetails).then((jwtTokenDatawithUserDetails)=>{
 //saving the data to local storage on browser!
  doLogin(jwtTokenDatawithUserDetails,()=>{
    console.log('login details is saved to local storage!!');
+
+ useContextData.setUser({
+   data:jwtTokenDatawithUserDetails.user,
+   login:true
+});
+
+
+
    //redirect to user dashboard page
 
    navigate("/user/dashboard");

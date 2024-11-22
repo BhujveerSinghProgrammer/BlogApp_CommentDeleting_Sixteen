@@ -40,7 +40,7 @@ const[user,setUser]=useState({})
       return;
     }
 
-    loadAllPostsByuserId(pageNumber, postContent.PageSize,CurrentUser().Id)
+    loadAllPostsByuserId(pageNumber, postContent.PageSize,CurrentUser()?.Id)
       .then((data) => {
         console.log('data to ram ji', data);
         // Only append posts that are not already in Contents to avoid duplicates
