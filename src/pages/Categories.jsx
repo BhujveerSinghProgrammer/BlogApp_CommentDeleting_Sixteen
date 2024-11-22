@@ -3,7 +3,7 @@ import Base from '../components/Base';
 import { useParams } from 'react-router-dom';
 import { Col, Container, Row } from "reactstrap";
 import CategorySideMenu from "../components/CategorySideMenu";
-import { loadAllPostsByPageNumberandPageSizeAndCategoryId } from '../services/post-service';
+import { loadAllPostsByPageNumberandPageSizeAndCategoryId,DeletePost } from '../services/post-service';
 import { toast } from 'react-toastify';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Posts from '../components/Posts';
@@ -85,6 +85,35 @@ function Categories() {
     }
   };
 
+  
+  //going to delete post
+
+
+  //function to delete post
+function DoDeletePost(post){
+//going to delete post
+ console.log(post);
+ DeletePost(post)
+      .then(data => {
+
+         console.log('Post Deleted successfully', data);
+         toast.success("Post Deleted successfully!");
+
+         // changePage(1);
+        // setCurrentPage(1);
+
+         let newpostContent=postContent.Contents.filter(p=>p.Id!=post.Id)
+         //we are passing p,coz using filter we will get one by one Id from "postContent.Contents",this will filter those Id's which are not belongs to "post.Id"
+         setPostContent({...postContent,Contents:newpostContent})
+
+         //Note:- This triggers a re-render of your component, because React re-renders when state changes.
+
+      })
+      .catch((error) => {
+        toast.error("Post creation failed!");
+      });
+}
+
   return (
     <Base>
       <Container className="mt-3">
@@ -94,8 +123,8 @@ function Categories() {
             <div className="container-fluid">
               <Row>
                 <Col md={{ size: 12 }}>
-                  <h3>Blogs Count ({postContent?.TotalElements})</h3>
-
+                  {/* <h3>Blogs Count ({postContent?.Contents?.length})</h3> */}
+          <h3 style={{color:'green',fontSize:'18px'}} >Blogs Count ({postContent?.Contents?.length?postContent?.Contents?.length:0})</h3>
                   {postContent.Contents.length === 0 ? (
                     // If there are no posts in the content array
                     <p>No posts found for this category.</p>
@@ -112,7 +141,7 @@ function Categories() {
                       }
                     >
                       {postContent?.Contents?.map((post) => (
-                        <Posts post={post} key={post.Id} />
+                        <Posts post={post} key={post.Id} DoDeletePost={DoDeletePost} />
                       ))}
                     </InfiniteScroll>
                   )}

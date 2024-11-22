@@ -95,7 +95,8 @@ function DoDeletePost(post){
     <div className="container-fluid">
       <Row>
         <Col md={{ size: 12}}>
-          <h3>Blogs Count ({postContent?.Contents?.length})</h3>
+         {/* <h3>Blogs Count ({postContent?.Contents?.length})</h3> */}
+             <h3 style={{color:'green',fontSize:'18px'}} >Blogs Count ({postContent?.Contents?.length?postContent?.Contents?.length:0})</h3>
 
           <InfiniteScroll
             dataLength={postContent?.Contents?.length}
