@@ -73,9 +73,16 @@ function DoDeletePost(post){
 
          console.log('Post Deleted successfully', data);
          toast.success("Post Deleted successfully!");
+
+         // changePage(1);
+        // setCurrentPage(1);
+
          let newpostContent=postContent.Contents.filter(p=>p.Id!=post.Id)
          //we are passing p,coz using filter we will get one by one Id from "postContent.Contents",this will filter those Id's which are not belongs to "post.Id"
          setPostContent({...postContent,Contents:newpostContent})
+
+         //Note:- This triggers a re-render of your component, because React re-renders when state changes.
+
       })
       .catch((error) => {
         toast.error("Post creation failed!");
