@@ -5,6 +5,15 @@ export const createPost=(postData)=>{
   return privateAxious.post('/api/ReactJsApis/PostContentDetails',postData).then((response)=>response.data);
 }
  
+
+//Delete Posts
+
+export const DeletePost=(postData)=>{
+  console.log('the Deleted data' + postData);
+  return privateAxious.post('/api/ReactJsApis/DeletePostContent',postData).then((response)=>response.data);
+}
+
+
 //get all posts
 //All get posts apis are public so use "myaxios" instead of privateAxious
 
