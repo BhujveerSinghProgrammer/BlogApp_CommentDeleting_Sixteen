@@ -7,33 +7,83 @@
 4.after logout we will again set the global state using context api in CustomeNavBar.jsx file 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Full code(Overview):-
 
 1.Context-->UserProvide.jsx:-
 
+import React, { useEffect, useState } from 'react'
+import userContext from './userContext'
+
+function UserProvider({children}) {
+
+
+  const[user,setUser]=useState({
+    data:{},
+    login:false
+  });
+
+  // useEffect(()=>{
+  //   setUser({
+  //     name:'Bhujveer Singh'
+  //   })
+  // },[]); //it will called on mounting phase only
+
+  return (
+   <userContext.Provider value={{user,setUser}}>
+    {children}
+   </userContext.Provider>
+  )
+}
+
+export default UserProvider
+
+
+
 2.Pages-->Login.jsx
+import { useState,useContext } from "react";
+
+import userContext from "../context/userContext";
+
 
 const useContextData=useContext(userContext);
 
-useContextData.setUser({
-  data:user,
-  login:true
+
+ useContextData.setUser({
+   data:jwtTokenDatawithUserDetails.user,
+   login:true
 });
 
+
+
 3.components-->CustomeNavBar.jsx
+import { useState,useContext } from "react";
+
 import userContext from "../context/userContext";
 
 
   const useContextData=useContext(userContext);
 
+ 
 useContextData.setUser({
-  data:{},
+  data:null,
   login:false
 });
 
-
 4.components-->Posts.jsx:-
 
+import { useState,useContext } from "react";
 
+import userContext from "../context/userContext";
+
+
+
+{useContextData.user.login && user.Id==post.userId?
+<Button onClick={()=>DoDeletePost(post)} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Full Code(Completed)
