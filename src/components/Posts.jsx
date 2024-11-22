@@ -1,8 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardText } from 'reactstrap'
+import { isLoggedIn,CurrentUser } from '../auth';
 
 function Posts({ post = { Title: "This is Default Post Title", Content: "This is Default Content" } }) {
+
+  const[login,setLogin]=useState(false);
+  const[user,setUser]=useState(undefined);
+
+useEffect(()=>
+  {
+    setLogin(isLoggedIn())
+    setUser(CurrentUser())
+    console.log('a user',user);
+console.log('b login',login);
+  },[login]
+  );
+
+
+
+
   return (
     <Card className='border-0 shadow-sm mb-3'>
       <CardBody>
@@ -18,7 +35,18 @@ function Posts({ post = { Title: "This is Default Post Title", Content: "This is
     </CardText>
         <div>
           <Link style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}} className='btn btn-secondary border -0' to={'/Post/'+post.Id} >Read More..</Link>
+
+{/* we will show delete button when user is loggedIn else will not show */}
+{login?user.Id==post.userId?
+<Button color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :'':''
+}
+
+
+
         </div>
+
+
+
       </CardBody>
     </Card>
   );

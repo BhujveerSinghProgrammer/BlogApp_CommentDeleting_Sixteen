@@ -170,10 +170,10 @@ const AddPost = () => {
             </div>
 
             <Container className="text-center">
-              <Button type="submit" className="rounded-0" color="primary">
+              <Button type="submit" style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}} className="rounded-0" color="primary">
                 Create Post
               </Button>
-              <Button type="button" onClick={resetData} className="rounded-0 ms-2" color="danger">
+              <Button style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}} type="button" onClick={resetData} className="rounded-0 ms-2" color="danger">
                 Reset
               </Button>
             </Container>

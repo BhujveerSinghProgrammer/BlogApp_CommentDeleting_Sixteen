@@ -1,4 +1,31 @@
-//Steps to perform Deleting Comment
+//...............................................................................................................................................
+//..............................................................................................................................................
+Q1. Ternary Operator use in js:-
+
+
+  const[login,setLogin]=useState(false);
+  const[user,setUser]=useState(undefined);
+
+useEffect(()=>
+  {
+    setLogin(isLoggedIn())
+    setUser(CurrentUser())
+    console.log('a user',user);
+console.log('b login',login);
+  },[login]
+  );
+
+{/* we will show delete button when user is loggedIn else will not show */}
+{
+  login?user.Id==post.userId?<Button color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :'':''
+}
+Note:- If login is true and "user.Id"=="post.userId" then show a button else show "" and "";
+
+//...............................................................................................................................................
+//..............................................................................................................................................
+
+Q2:-//Steps to perform Deleting Comment ?
+
 Step 1:- post-service.js:-
 
 //get posts by pagenumber and pazesize and userId
