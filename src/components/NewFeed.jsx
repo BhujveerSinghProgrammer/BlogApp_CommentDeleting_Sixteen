@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'; 
-import { loadAllPostsByPageNumberandPageSize } from '../services/post-service';
+import { loadAllPostsByPageNumberandPageSize,DeletePost } from '../services/post-service';
 import { Row, Col, Container } from 'reactstrap';
 import Posts from './Posts';
 import { toast } from 'react-toastify';
@@ -60,11 +60,35 @@ function NewFeed() {
     }
   };
 
+
+  //going to delete post
+
+
+  //function to delete post
+function DoDeletePost(post){
+//going to delete post
+ console.log(post);
+ DeletePost(post)
+      .then(data => {
+
+         console.log('Post Deleted successfully', data);
+         toast.success("Post Deleted successfully!");
+         let newpostContent=postContent.Contents.filter(p=>p.Id!=post.Id)
+         //we are passing p,coz using filter we will get one by one Id from "postContent.Contents",this will filter those Id's which are not belongs to "post.Id"
+         setPostContent({...postContent,Contents:newpostContent})
+      })
+      .catch((error) => {
+        toast.error("Post creation failed!");
+      });
+}
+
+
+
   return (
     <div className="container-fluid">
       <Row>
         <Col md={{ size: 12}}>
-          <h3>Blogs Count ({postContent?.TotalElements})</h3>
+          <h3>Blogs Count ({postContent?.Contents?.length})</h3>
 
           <InfiniteScroll
             dataLength={postContent?.Contents?.length}
@@ -78,7 +102,7 @@ function NewFeed() {
             }
            >
             {postContent?.Contents?.map((post) => (
-              <Posts post={post} key={post.Id} />
+              <Posts post={post} key={post.Id} DoDeletePost={DoDeletePost} />
             ))}
           </InfiniteScroll>
         </Col>

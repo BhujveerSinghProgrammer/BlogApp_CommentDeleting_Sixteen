@@ -29,6 +29,9 @@ Note:- If login is true and "user.Id"=="post.userId" then show a button else sho
 
 Q2:-//Steps to perform Deleting Comment ?
 
+
+
+
 Step 1:- post-service.js:-
 
 //get posts by pagenumber and pazesize and userId
@@ -261,4 +264,47 @@ export default Posts;
 
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+Formal Steps:-
+1. Userdashboard.jsx:-
+
+function DoDeletePost(post){
+//going to delete post
+ console.log(post);
+ DeletePost(post)
+      .then(data => {
+         console.log('Post Deleted successfully', data);
+         toast.success("Post Deleted successfully!");
+      
+      })
+      .catch((error) => {
+        toast.error("Post creation failed!");
+      });
+}
+
+->in Userdashboard.jsx we are creating a function name "DoDeletePost",Userdashboard.jsx is our parent component,
+->and then we are passing this to the "Posts" as parameter as function(prop drilling)
+
+
+       {postContent?.Contents?.map((post) => (
+              <Posts post={post} key={post.Id} DoDeletePost ={DoDeletePost } />
+            ))}
+-->
+
+2.Posts.jsx:-
+
+function Posts( { post = { Title: "This is Default Post Title", Content: "This is Default Content" } ,DoDeletePost}) {
+and 
+using this function on Button click like given below:-
+
+{login && user.Id==post.userId?
+<Button onClick={()=>DoDeletePost(post)} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
+}
+
+
+//
 

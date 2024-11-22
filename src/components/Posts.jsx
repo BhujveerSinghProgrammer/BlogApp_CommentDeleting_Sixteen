@@ -2,65 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, CardText } from 'reactstrap'
 import { isLoggedIn,CurrentUser } from '../auth';
-import {DeletePost} from "../services/post-service"; 
-import { toast } from "react-toastify";
 
-
-function Posts({ post = { Title: "This is Default Post Title", Content: "This is Default Content" } }) {
+function Posts( { post = { Title: "This is Default Post Title", Content: "This is Default Content" } ,DoDeletePost}) {
 
   const[login,setLogin]=useState(false);
   const[user,setUser]=useState(undefined);
-const[postDetails,setPostDetails]=useState({
-  Id:'',
-  userId:''
-})
 
 useEffect(()=>
   {
     setLogin(isLoggedIn())
     setUser(CurrentUser())
-    setPostDetails({
-      Id:post.Id,
-      userId:post.userId
-    })
     console.log('a user',user);
     console.log('b login',login);
   },[login]
   );
-
-
-
-  // Create post function
-  const DoDeletePost = (event) => {
-    event.preventDefault();
-    // Form validation
-    if (post.Id=== '') {
-      alert('Cintent Id is required!');
-      return;
-    }
-    if (post.userId === '') {
-      alert('userId is required!');
-      return;
-    }
-
-    // Add user ID to post object
-
-    // Submit the post form
-    DeletePost(post)
-      .then(data => {
-        console.log('Post Deleted successfully', data);
-         toast.success("Post Deleted successfully!");
-        // Reset the form
-        setPostDetails({
-          Id: "",
-          userId: ""
-        });
-      })
-      .catch((error) => {
-        toast.error("Post creation failed!");
-      });
-  };
-
 
 
   return (
@@ -81,7 +36,7 @@ useEffect(()=>
 
 {/* we will show delete button when user is loggedIn else will not show */}
 {login && user.Id==post.userId?
-<Button onClick={DoDeletePost} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
+<Button onClick={()=>DoDeletePost(post)} color='danger'  className='ms-2' style={{ height: '19px ',width: '76px ',padding: '0px ', fontSize:'11px',color:'Yellow'}}>Delete</Button> :''
 }
         </div>
 

@@ -3,7 +3,7 @@ import Base from '../../components/Base';
 import AddPost from '../../components/AddPost';
 import { Row, Col, Container } from 'reactstrap';
 import {CurrentUser} from '../../auth/index';
-import { loadAllPostsByuserId } from '../../services/post-service';
+import { loadAllPostsByuserId,DeletePost } from '../../services/post-service';
 import { toast } from 'react-toastify';
 import Posts from '../../components/Posts';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -66,14 +66,44 @@ const[user,setUser]=useState({})
       setCurrentPage((prevPage) => prevPage + 1);
     }
   };
+
+//function to delete post
+function DoDeletePost(post){
+//going to delete post
+ console.log(post);
+ DeletePost(post)
+      .then(data => {
+
+         console.log('Post Deleted successfully', data);
+         toast.success("Post Deleted successfully!");
+        let newpostContent=postContent.Contents.filter(p=>p.Id!=post.Id)
+         //we are passing p,coz using filter we will get one by one Id from "postContent.Contents",this will filter those Id's which are not belongs to "post.Id"
+         setPostContent({...postContent,Contents:newpostContent})
+
+      })
+      .catch((error) => {
+        toast.error("Post creation failed!");
+      });
+}
+
+
+
+//
+
+
+
   return (
     <Base>
     <Container>
+
+
          <AddPost/>
+
+
            <div className="container-fluid">
       <Row>
         <Col md={{ size: 12}}>
-          <h3>Blogs Count ({postContent?.TotalElements})</h3>
+          <h3 style={{color:'green',fontSize:'18px'}} >Blogs Count ({postContent?.Contents?.length?postContent?.Contents?.length:0})</h3>
 
           <InfiniteScroll
             dataLength={postContent?.Contents?.length}
@@ -87,7 +117,7 @@ const[user,setUser]=useState({})
             }
            >
             {postContent?.Contents?.map((post) => (
-              <Posts post={post} key={post.Id} />
+              <Posts post={post} key={post.Id} DoDeletePost ={DoDeletePost } />
             ))}
           </InfiniteScroll>
         </Col>
